@@ -6,7 +6,7 @@ targetCustomizations:
       atlas: "true"
   helm:
     chart: poslite-cloudflared
-    repo: oci://aspposlite.azurecr.io/helm
+    repo: oci://atlashelmrepo.azurecr.io/helm
     version: 1.0.0
     values:
       replicas: 1

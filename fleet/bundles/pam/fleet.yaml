@@ -7,7 +7,7 @@ targetCustomizations:
       poslite: "pam"
   helm:
     chart: poslite-pam
-    repo: oci://aspposlite.azurecr.io/helm
+    repo: oci://atlashelmrepo.azurecr.io/helm
     version: 1.0.0
     values:
       guardApi:
