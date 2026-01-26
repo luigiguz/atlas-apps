@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "poslite-horustech.fullname" . }}-config
+  labels:
+    {{- include "poslite-horustech.labels" . | nindent 4 }}
+data:
+  ierp-url: {{ .Values.config.ierpUrl | quote }}
+  horustech-ip: {{ .Values.config.horustechIp | quote }}
+  horustech-port-webapi: {{ .Values.config.horustechPortWebapi | quote }}
+  horustech-port-workers: {{ .Values.config.horustechPortWorkers | quote }}
+  horustech-tanks-ip: {{ .Values.config.horustechTanksIp | quote }}
+  smtp-to: "notisachristian@gmail.com"

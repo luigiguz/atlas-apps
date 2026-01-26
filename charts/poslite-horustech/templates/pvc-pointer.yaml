@@ -1,0 +1,17 @@
+{{- if .Values.persistence.pointer.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "poslite-horustech.fullname" . }}-pointer
+  labels:
+    {{- include "poslite-horustech.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.pointer.accessMode }}
+  {{- if .Values.persistence.pointer.storageClass }}
+  storageClassName: {{ .Values.persistence.pointer.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.pointer.size }}
+{{- end }}

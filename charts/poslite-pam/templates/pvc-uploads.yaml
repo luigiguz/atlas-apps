@@ -1,0 +1,17 @@
+{{- if .Values.persistence.uploads.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "poslite-pam.fullname" . }}-uploads
+  labels:
+    {{- include "poslite-pam.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.uploads.accessMode }}
+  {{- if .Values.persistence.uploads.storageClass }}
+  storageClassName: {{ .Values.persistence.uploads.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.uploads.size }}
+{{- end }}

@@ -1,0 +1,108 @@
+{{- if .Values.webapi.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-horustech.fullname" . }}-webapi
+  labels:
+    {{- include "poslite-horustech.labels" . | nindent 4 }}
+    component: webapi
+spec:
+  replicas: {{ .Values.webapi.replicas }}
+  selector:
+    matchLabels:
+      {{- include "poslite-horustech.selectorLabels" . | nindent 6 }}
+      component: webapi
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-horustech.selectorLabels" . | nindent 8 }}
+        component: webapi
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: webapi
+        image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.webapi.image.repository }}:{{ .Values.webapi.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 0
+        ports:
+        - name: http
+          containerPort: {{ .Values.webapi.port }}
+          hostPort: {{ .Values.webapi.hostPort }}
+          protocol: TCP
+        env:
+        - name: TZ
+          value: {{ .Values.config.timezone }}
+        - name: HorustechTcpClient:IP
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "poslite-horustech.fullname" . }}-config
+              key: horustech-ip
+        - name: HorustechTcpClient:Port
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "poslite-horustech.fullname" . }}-config
+              key: horustech-port-webapi
+        - name: HorustechTcpClient:TLSPort
+          value: "{{ .Values.config.horustechTlsPort }}"
+        - name: CoreApiClient:BaseUrl
+          value: "http://{{ include "poslite-horustech.coreWebapiService" . }}:{{ .Values.coreWebapi.port }}/"
+        - name: CoreApiClient:ApiKey
+          value: {{ .Values.config.coreApiKey | quote }}
+        - name: GuardApi:Url
+          value: "http://{{ include "poslite-horustech.guardApiService" . }}:{{ .Values.guardApi.port }}/guard/status"
+        workingDir: /app
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.webapi.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.webapi.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+      hostname: horustech-webapi
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
+---
+{{- if .Values.webapi.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "poslite-horustech.webapiService" . }}
+  labels:
+    {{- include "poslite-horustech.labels" . | nindent 4 }}
+    component: webapi
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.webapi.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "poslite-horustech.selectorLabels" . | nindent 4 }}
+    component: webapi
+{{- end }}

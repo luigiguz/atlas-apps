@@ -1,0 +1,51 @@
+# Default values for poslite-db
+replicaCount: 1
+
+image:
+  repository: postgres
+  pullPolicy: IfNotPresent
+  tag: "15"
+
+pgadmin:
+  enabled: true
+  image:
+    repository: dpage/pgadmin4
+    tag: latest
+  port: 5050
+  hostPort: 5050
+  defaultEmail: admin@admin.com
+  defaultPassword: admin
+
+postgresql:
+  user: sa
+  password: ""
+  database: poslite
+  port: 5432
+  hostPort: 5432
+  timezone: "America/Panama"
+  shmSize: "128mb"
+
+persistence:
+  enabled: true
+  storageClass: local-path
+  size: 20Gi
+  accessMode: ReadWriteOnce
+
+configMap:
+  postgresqlConf: |
+    # PostgreSQL configuration will be provided via ConfigMap
+
+serviceAccount:
+  create: false
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,17 @@
+{{- if .Values.persistence.licenses.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "poslite-horustech.fullname" . }}-licenses
+  labels:
+    {{- include "poslite-horustech.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.licenses.accessMode }}
+  {{- if .Values.persistence.licenses.storageClass }}
+  storageClassName: {{ .Values.persistence.licenses.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.licenses.size }}
+{{- end }}

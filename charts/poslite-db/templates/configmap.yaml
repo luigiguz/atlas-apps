@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "poslite-db.fullname" . }}-config
+  labels:
+    {{- include "poslite-db.labels" . | nindent 4 }}
+data:
+  postgresql.conf: |
+{{ .Values.configMap.postgresqlConf | indent 4 }}

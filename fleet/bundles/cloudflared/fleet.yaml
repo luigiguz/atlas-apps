@@ -1,0 +1,11 @@
+defaultNamespace: poslite
+targetCustomizations:
+- name: cloudflared
+  clusterSelector:
+    matchLabels:
+      atlas: "true"
+  helm:
+    chart: ../../charts/poslite-cloudflared
+    values:
+      replicas: 1
+      hostNetwork: true
