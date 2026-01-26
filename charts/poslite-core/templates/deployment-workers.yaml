@@ -1,0 +1,734 @@
+{{- if .Values.workers.price.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-core.fullname" . }}-price-worker
+  labels:
+    {{- include "poslite-core.labels" . | nindent 4 }}
+    component: worker
+    worker-type: price
+spec:
+  replicas: {{ .Values.workers.price.replicas }}
+  selector:
+    matchLabels:
+      {{- include "poslite-core.selectorLabels" . | nindent 6 }}
+      component: worker
+      worker-type: price
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-core.selectorLabels" . | nindent 8 }}
+        component: worker
+        worker-type: price
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: worker
+        image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.price.image.repository }}:{{ .Values.workers.price.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 0
+        env:
+        - name: TZ
+          value: {{ .Values.config.timezone }}
+        - name: GasStationBackend:CoreBaseUrl
+          value: "http://{{ include "poslite-core.webapiService" . }}:{{ .Values.webapi.port }}/"
+        - name: GasStationBackend:Backend
+          value: "Core"
+        - name: PROCESS
+          value: "scheduledPriceChange"
+        - name: Workers:ScheduledPriceChange:CronExpression
+          value: "/5 * * *"
+        workingDir: /app
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      hostname: core-price-worker
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
+---
+{{- if .Values.workers.shift.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-core.fullname" . }}-shift-worker
+  labels:
+    {{- include "poslite-core.labels" . | nindent 4 }}
+    component: worker
+    worker-type: shift
+spec:
+  replicas: {{ .Values.workers.shift.replicas }}
+  selector:
+    matchLabels:
+      {{- include "poslite-core.selectorLabels" . | nindent 6 }}
+      component: worker
+      worker-type: shift
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-core.selectorLabels" . | nindent 8 }}
+        component: worker
+        worker-type: shift
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: worker
+        image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.shift.image.repository }}:{{ .Values.workers.shift.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 0
+        env:
+        - name: TZ
+          value: {{ .Values.config.timezone }}
+        - name: PROCESS
+          value: "scheduledShiftChange"
+        - name: Workers:ScheduledShiftChange:CronExpression
+          value: "0 /8 * *"
+        workingDir: /app
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      hostname: core-shift-worker
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
+---
+{{- if .Values.workers.errorReports.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-core.fullname" . }}-error-reports-worker
+  labels:
+    {{- include "poslite-core.labels" . | nindent 4 }}
+    component: worker
+    worker-type: error-reports
+spec:
+  replicas: {{ .Values.workers.errorReports.replicas }}
+  selector:
+    matchLabels:
+      {{- include "poslite-core.selectorLabels" . | nindent 6 }}
+      component: worker
+      worker-type: error-reports
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-core.selectorLabels" . | nindent 8 }}
+        component: worker
+        worker-type: error-reports
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: worker
+        image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.errorReports.image.repository }}:{{ .Values.workers.errorReports.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 0
+        env:
+        - name: TZ
+          value: {{ .Values.config.timezone }}
+        - name: ConnectionStrings:CoreDbConnection
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: db-connection-string
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: CoreApiClient:BaseUrl
+          value: "http://{{ include "poslite-core.webapiService" . }}:{{ .Values.webapi.port }}/"
+        - name: CoreApiClient:ApiKey
+          value: {{ .Values.config.coreApiKey | quote }}
+        - name: PROCESS
+          value: "none"
+        - name: SendEmailProccess
+          value: "true"
+        - name: Workers:BasicData:CronExpressionEmail
+          value: "0 12,18 * * *"
+        - name: SmtpSettings:From
+          value: "noreplyasptg@asptg.com"
+        - name: SmtpSettings:To
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: smtp-to
+        - name: SmtpSettings:Host
+          value: "smtp.office365.com"
+        - name: SmtpSettings:Port
+          value: "587"
+        - name: SmtpSettings:EnableSsl
+          value: "true"
+        - name: SmtpSettings:UserName
+          value: "noreplyasptg@asptg.com"
+        - name: SmtpSettings:Password
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: smtp-password
+        workingDir: /app
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      hostname: core-error-reports-worker
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
+{{- if .Values.workers.ierp.enabled }}
+---
+{{- if .Values.workers.ierp.dispatchesToInvoice.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-core.fullname" . }}-dispatches-to-invoice-worker
+  labels:
+    {{- include "poslite-core.labels" . | nindent 4 }}
+    component: worker
+    worker-type: ierp
+    ierp-worker: dispatches-to-invoice
+spec:
+  replicas: {{ .Values.workers.ierp.dispatchesToInvoice.replicas }}
+  selector:
+    matchLabels:
+      {{- include "poslite-core.selectorLabels" . | nindent 6 }}
+      component: worker
+      worker-type: ierp
+      ierp-worker: dispatches-to-invoice
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-core.selectorLabels" . | nindent 8 }}
+        component: worker
+        worker-type: ierp
+        ierp-worker: dispatches-to-invoice
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: worker
+        image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.dispatchesToInvoice.image.repository }}:{{ .Values.workers.ierp.dispatchesToInvoice.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 0
+        env:
+        - name: TZ
+          value: {{ .Values.config.timezone }}
+        - name: CoreApiClient:BaseUrl
+          value: "http://{{ include "poslite-core.webapiService" . }}:{{ .Values.webapi.port }}/"
+        - name: CoreApiClient:ApiKey
+          value: {{ .Values.config.coreApiKey | quote }}
+        - name: IerpApi:BaseUrl
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: ierp-url
+        - name: ConnectionStrings:CoreDbConnection
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: db-connection-string
+        - name: PROCESS
+          value: "dispatchestoinvoices"
+        workingDir: /app
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      hostname: core-dispatches-to-invoice-worker
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
+---
+{{- if .Values.workers.ierp.dispatchPayments.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-core.fullname" . }}-ierp-dispatch-payments-worker
+  labels:
+    {{- include "poslite-core.labels" . | nindent 4 }}
+    component: worker
+    worker-type: ierp
+    ierp-worker: dispatch-payments
+spec:
+  replicas: {{ .Values.workers.ierp.dispatchPayments.replicas }}
+  selector:
+    matchLabels:
+      {{- include "poslite-core.selectorLabels" . | nindent 6 }}
+      component: worker
+      worker-type: ierp
+      ierp-worker: dispatch-payments
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-core.selectorLabels" . | nindent 8 }}
+        component: worker
+        worker-type: ierp
+        ierp-worker: dispatch-payments
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: worker
+        image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.dispatchPayments.image.repository }}:{{ .Values.workers.ierp.dispatchPayments.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 0
+        env:
+        - name: TZ
+          value: {{ .Values.config.timezone }}
+        - name: CoreApiClient:BaseUrl
+          value: "http://{{ include "poslite-core.webapiService" . }}:{{ .Values.webapi.port }}/"
+        - name: CoreApiClient:ApiKey
+          value: {{ .Values.config.coreApiKey | quote }}
+        - name: IerpApi:BaseUrl
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: ierp-url
+        - name: ConnectionStrings:CoreDbConnection
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: db-connection-string
+        - name: PROCESS
+          value: "dispatchpayments"
+        - name: Workers:DispatchPayments:CronExpression
+          value: "*/10 * * * *"
+        - name: Workers:DispatchPayments:BatchSize
+          value: "100"
+        workingDir: /app
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      hostname: core-ierp-dispatch-payments-worker
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
+---
+{{- if .Values.workers.ierp.invoicesToIerp.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-core.fullname" . }}-invoices-to-ierp-worker
+  labels:
+    {{- include "poslite-core.labels" . | nindent 4 }}
+    component: worker
+    worker-type: ierp
+    ierp-worker: invoices-to-ierp
+spec:
+  replicas: {{ .Values.workers.ierp.invoicesToIerp.replicas }}
+  selector:
+    matchLabels:
+      {{- include "poslite-core.selectorLabels" . | nindent 6 }}
+      component: worker
+      worker-type: ierp
+      ierp-worker: invoices-to-ierp
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-core.selectorLabels" . | nindent 8 }}
+        component: worker
+        worker-type: ierp
+        ierp-worker: invoices-to-ierp
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: worker
+        image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.invoicesToIerp.image.repository }}:{{ .Values.workers.ierp.invoicesToIerp.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 0
+        env:
+        - name: TZ
+          value: {{ .Values.config.timezone }}
+        - name: CoreApiClient:BaseUrl
+          value: "http://{{ include "poslite-core.webapiService" . }}:{{ .Values.webapi.port }}/"
+        - name: CoreApiClient:ApiKey
+          value: {{ .Values.config.coreApiKey | quote }}
+        - name: IerpApi:BaseUrl
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: ierp-url
+        - name: ConnectionStrings:CoreDbConnection
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: db-connection-string
+        - name: PROCESS
+          value: "posliteinvoices"
+        - name: Workers:PosLiteToIerpInvoices:BatchSize
+          value: "50"
+        workingDir: /app
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      hostname: core-invoices-to-ierp-worker
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
+---
+{{- if .Values.workers.ierp.customers.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-core.fullname" . }}-ierp-customers-worker
+  labels:
+    {{- include "poslite-core.labels" . | nindent 4 }}
+    component: worker
+    worker-type: ierp
+    ierp-worker: customers
+spec:
+  replicas: {{ .Values.workers.ierp.customers.replicas }}
+  selector:
+    matchLabels:
+      {{- include "poslite-core.selectorLabels" . | nindent 6 }}
+      component: worker
+      worker-type: ierp
+      ierp-worker: customers
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-core.selectorLabels" . | nindent 8 }}
+        component: worker
+        worker-type: ierp
+        ierp-worker: customers
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: worker
+        image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.customers.image.repository }}:{{ .Values.workers.ierp.customers.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 0
+        env:
+        - name: TZ
+          value: {{ .Values.config.timezone }}
+        - name: CoreApiClient:BaseUrl
+          value: "http://{{ include "poslite-core.webapiService" . }}:{{ .Values.webapi.port }}/"
+        - name: CoreApiClient:ApiKey
+          value: {{ .Values.config.coreApiKey | quote }}
+        - name: IerpApi:BaseUrl
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: ierp-url
+        - name: ConnectionStrings:CoreDbConnection
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: db-connection-string
+        - name: PROCESS
+          value: "customers"
+        - name: Workers:Customers:CronExpression
+          value: "*/5 * * * *"
+        workingDir: /app
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      hostname: core-ierp-customers-worker
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
+---
+{{- if .Values.workers.ierp.markets.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-core.fullname" . }}-ierp-markets-worker
+  labels:
+    {{- include "poslite-core.labels" . | nindent 4 }}
+    component: worker
+    worker-type: ierp
+    ierp-worker: markets
+spec:
+  replicas: {{ .Values.workers.ierp.markets.replicas }}
+  selector:
+    matchLabels:
+      {{- include "poslite-core.selectorLabels" . | nindent 6 }}
+      component: worker
+      worker-type: ierp
+      ierp-worker: markets
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-core.selectorLabels" . | nindent 8 }}
+        component: worker
+        worker-type: ierp
+        ierp-worker: markets
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: worker
+        image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.markets.image.repository }}:{{ .Values.workers.ierp.markets.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 0
+        env:
+        - name: TZ
+          value: {{ .Values.config.timezone }}
+        - name: CoreApiClient:BaseUrl
+          value: "http://{{ include "poslite-core.webapiService" . }}:{{ .Values.webapi.port }}/"
+        - name: CoreApiClient:ApiKey
+          value: {{ .Values.config.coreApiKey | quote }}
+        - name: IerpApi:BaseUrl
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: ierp-url
+        - name: ConnectionStrings:CoreDbConnection
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: db-connection-string
+        - name: PROCESS
+          value: "markets"
+        - name: Workers:Markets:CronExpression
+          value: "*/5 * * * *"
+        workingDir: /app
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      hostname: core-ierp-markets-worker
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
+---
+{{- if .Values.workers.ierp.basicData.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-core.fullname" . }}-ierp-basic-data-worker
+  labels:
+    {{- include "poslite-core.labels" . | nindent 4 }}
+    component: worker
+    worker-type: ierp
+    ierp-worker: basic-data
+spec:
+  replicas: {{ .Values.workers.ierp.basicData.replicas }}
+  selector:
+    matchLabels:
+      {{- include "poslite-core.selectorLabels" . | nindent 6 }}
+      component: worker
+      worker-type: ierp
+      ierp-worker: basic-data
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-core.selectorLabels" . | nindent 8 }}
+        component: worker
+        worker-type: ierp
+        ierp-worker: basic-data
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: worker
+        image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.basicData.image.repository }}:{{ .Values.workers.ierp.basicData.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 0
+        env:
+        - name: TZ
+          value: {{ .Values.config.timezone }}
+        - name: CoreApiClient:BaseUrl
+          value: "http://{{ include "poslite-core.webapiService" . }}:{{ .Values.webapi.port }}/"
+        - name: CoreApiClient:ApiKey
+          value: {{ .Values.config.coreApiKey | quote }}
+        - name: IerpApi:BaseUrl
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: ierp-url
+        - name: ConnectionStrings:CoreDbConnection
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: db-connection-string
+        - name: PROCESS
+          value: "basicdata"
+        - name: Workers:BasicData:CronExpression
+          value: "* */1 * * *"
+        workingDir: /app
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      hostname: core-ierp-basic-data-worker
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
+---
+{{- if .Values.workers.ierp.invoiceSeries.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-core.fullname" . }}-ierp-invoice-series-worker
+  labels:
+    {{- include "poslite-core.labels" . | nindent 4 }}
+    component: worker
+    worker-type: ierp
+    ierp-worker: invoice-series
+spec:
+  replicas: {{ .Values.workers.ierp.invoiceSeries.replicas }}
+  selector:
+    matchLabels:
+      {{- include "poslite-core.selectorLabels" . | nindent 6 }}
+      component: worker
+      worker-type: ierp
+      ierp-worker: invoice-series
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-core.selectorLabels" . | nindent 8 }}
+        component: worker
+        worker-type: ierp
+        ierp-worker: invoice-series
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: worker
+        image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.invoiceSeries.image.repository }}:{{ .Values.workers.ierp.invoiceSeries.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 0
+        env:
+        - name: TZ
+          value: {{ .Values.config.timezone }}
+        - name: CoreApiClient:BaseUrl
+          value: "http://{{ include "poslite-core.webapiService" . }}:{{ .Values.webapi.port }}/"
+        - name: CoreApiClient:ApiKey
+          value: {{ .Values.config.coreApiKey | quote }}
+        - name: IerpApi:BaseUrl
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: ierp-url
+        - name: ConnectionStrings:CoreDbConnection
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: db-connection-string
+        - name: PROCESS
+          value: "invoiceseries"
+        - name: Workers:InvoiceSeries:CronExpression
+          value: "*/5 * * * *"
+        workingDir: /app
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      hostname: core-ierp-invoice-series-worker
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
+---
+{{- if .Values.workers.ierp.products.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-core.fullname" . }}-ierp-products-worker
+  labels:
+    {{- include "poslite-core.labels" . | nindent 4 }}
+    component: worker
+    worker-type: ierp
+    ierp-worker: products
+spec:
+  replicas: {{ .Values.workers.ierp.products.replicas }}
+  selector:
+    matchLabels:
+      {{- include "poslite-core.selectorLabels" . | nindent 6 }}
+      component: worker
+      worker-type: ierp
+      ierp-worker: products
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-core.selectorLabels" . | nindent 8 }}
+        component: worker
+        worker-type: ierp
+        ierp-worker: products
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: worker
+        image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.products.image.repository }}:{{ .Values.workers.ierp.products.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 0
+        env:
+        - name: TZ
+          value: {{ .Values.config.timezone }}
+        - name: CoreApiClient:BaseUrl
+          value: "http://{{ include "poslite-core.webapiService" . }}:{{ .Values.webapi.port }}/"
+        - name: CoreApiClient:ApiKey
+          value: {{ .Values.config.coreApiKey | quote }}
+        - name: IerpApi:BaseUrl
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: ierp-url
+        - name: ConnectionStrings:CoreDbConnection
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "poslite-core.fullname" . }}-config
+              key: db-connection-string
+        - name: PROCESS
+          value: "products"
+        - name: Workers:Products:CronExpression
+          value: "*/5 * * * *"
+        workingDir: /app
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      hostname: core-ierp-products-worker
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+{{- end }}

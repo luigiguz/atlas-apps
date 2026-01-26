@@ -1,0 +1,119 @@
+# Default values for poslite-core
+imageRegistry: aspposlite.azurecr.io
+imageRepository: asptg.com/ierpposlite
+
+portal:
+  enabled: true
+  image:
+    repository: core/portal
+    tag: stable
+  port: 8080
+  hostPort: 10014
+  replicas: 1
+
+webapi:
+  enabled: true
+  image:
+    repository: core/webapi
+    tag: stable
+  port: 8080
+  hostPort: 10012
+  replicas: 1
+
+workers:
+  price:
+    enabled: true
+    image:
+      repository: core/worker
+      tag: stable
+    replicas: 1
+  shift:
+    enabled: true
+    image:
+      repository: core/worker
+      tag: stable
+    replicas: 1
+  errorReports:
+    enabled: true
+    image:
+      repository: ierpposlite/ierp/dataworker
+      tag: stable
+    replicas: 1
+  ierp:
+    enabled: true
+    dispatchesToInvoice:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: stable
+      replicas: 1
+    dispatchPayments:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: stable
+      replicas: 1
+    invoicesToIerp:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: stable
+      replicas: 1
+    customers:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: stable
+      replicas: 1
+    markets:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: stable
+      replicas: 1
+    basicData:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: stable
+      replicas: 1
+    invoiceSeries:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: stable
+      replicas: 1
+    products:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: stable
+      replicas: 1
+
+config:
+  timezone: "America/Panama"
+  companyId: 1
+  coreApiKey: "TEST"
+  ierpUrl: ""
+
+persistence:
+  uploads:
+    enabled: true
+    storageClass: local-path
+    size: 10Gi
+    accessMode: ReadWriteMany
+
+imagePullSecrets:
+  - name: acr-secret
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,193 @@
+# Default values for poslite-horustech
+imageRegistry: aspposlite.azurecr.io
+imageRepository: asptg.com/ierpposlite
+
+# Guard API (solo en new-compose)
+guardApi:
+  enabled: true
+  image:
+    repository: guardapi
+    tag: latest
+  port: 8080
+  hostPort: 9015
+  replicas: 1
+  license:
+    enabled: false
+    licensesDir: "/datos/.licenses/Horustech"
+
+# Portal
+portal:
+  enabled: true
+  image:
+    repository: core/portal
+    tag: latest
+  port: 8080
+  hostPort: 9014
+  replicas: 1
+
+# WebAPI
+webapi:
+  enabled: true
+  image:
+    repository: horustech/webapi
+    tag: latest
+  port: 8080
+  hostPort: 9010
+  replicas: 1
+
+# Core WebAPI
+coreWebapi:
+  enabled: true
+  image:
+    repository: core/webapi
+    tag: latest
+  port: 8080
+  hostPort: 9012
+  replicas: 1
+
+# Core WebEvents
+coreWebevents:
+  enabled: true
+  image:
+    repository: core/webevents
+    tag: latest
+  port: 8080
+  hostPort: 9020
+  replicas: 1
+
+# Core Loyalty Config Worker (solo new-compose)
+coreLoyaltyConfigWorker:
+  enabled: true
+  image:
+    repository: core/worker
+    tag: latest
+  port: 8080
+  hostPort: 9021
+  replicas: 1
+
+# Workers (sin puertos expuestos)
+workers:
+  price:
+    enabled: true
+    image:
+      repository: core/worker
+      tag: latest
+    replicas: 1
+  shift:
+    enabled: true
+    image:
+      repository: core/worker
+      tag: latest
+    replicas: 1
+  errorReports:
+    enabled: true
+    image:
+      repository: ierpposlite/ierp/dataworker
+      tag: latest
+    replicas: 1
+  dispatches:
+    enabled: true
+    image:
+      repository: horustech/dataworker
+      tag: latest
+    replicas: 1
+  tanks:
+    enabled: true
+    image:
+      repository: horustech/dataworker
+      tag: latest
+    replicas: 1
+  ierp:
+    enabled: true
+    dispatchesToInvoice:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: latest
+      replicas: 1
+    dispatchPayments:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: latest
+      replicas: 1
+    invoicesToIerp:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: latest
+      replicas: 1
+    customers:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: latest
+      replicas: 1
+    markets:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: latest
+      replicas: 1
+    basicData:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: latest
+      replicas: 1
+    invoiceSeries:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: latest
+      replicas: 1
+    products:
+      enabled: true
+      image:
+        repository: ierpposlite/ierp/dataworker
+        tag: latest
+      replicas: 1
+
+config:
+  timezone: "America/Panama"
+  companyId: 1
+  coreApiKey: "TEST"
+  horustechApiKey: "TEST"
+  ierpUrl: "http://ierpgateway.azurewebsites.net/"
+  horustechIp: ""
+  horustechPortWebapi: "857"  # Puerto WebAPI
+  horustechPortWorkers: "1771"  # Puerto Workers
+  horustechTanksIp: ""
+  horustechTlsPort: 10002
+
+persistence:
+  uploads:
+    enabled: true
+    storageClass: local-path
+    size: 10Gi
+    accessMode: ReadWriteMany
+  pointer:
+    enabled: true
+    storageClass: local-path
+    size: 5Gi
+    accessMode: ReadWriteOnce
+  licenses:
+    enabled: true
+    storageClass: local-path
+    size: 1Gi
+    accessMode: ReadOnlyMany
+
+imagePullSecrets:
+  - name: acr-secret
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

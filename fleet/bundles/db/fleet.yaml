@@ -1,0 +1,16 @@
+defaultNamespace: poslite
+targetCustomizations:
+- name: db
+  clusterSelector:
+    matchLabels:
+      atlas: "true"
+  helm:
+    chart: ../../charts/poslite-db
+    values:
+      postgresql:
+        password: ""
+        timezone: "America/Panama"
+      persistence:
+        storageClass: local-path
+      pgadmin:
+        enabled: true

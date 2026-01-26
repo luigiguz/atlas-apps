@@ -1,0 +1,122 @@
+{{- if .Values.guardApi.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-pam.fullname" . }}-guard-api
+  labels:
+    {{- include "poslite-pam.labels" . | nindent 4 }}
+    component: guard-api
+spec:
+  replicas: {{ .Values.guardApi.replicas }}
+  selector:
+    matchLabels:
+      {{- include "poslite-pam.selectorLabels" . | nindent 6 }}
+      component: guard-api
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-pam.selectorLabels" . | nindent 8 }}
+        component: guard-api
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: guard-api
+        image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.guardApi.image.repository }}:{{ .Values.guardApi.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: {{ .Values.guardApi.port }}
+          hostPort: {{ .Values.guardApi.hostPort }}
+          protocol: TCP
+        env:
+        - name: TZ
+          value: {{ .Values.config.timezone }}
+        - name: ASPNETCORE_HTTP_PORTS
+          value: "{{ .Values.guardApi.port }}"
+        - name: Logging__LogLevel__Default
+          value: "Information"
+        - name: Logging__LogLevel__Microsoft.AspNetCore
+          value: "Warning"
+        - name: AllowedHosts
+          value: "*"
+        - name: License__LicenseFile
+          value: "/app/licenses/license.signed.json"
+        - name: License__PublicKeyFile
+          value: "/app/licenses/public.pem"
+        - name: License__UseLicense
+          value: {{ .Values.guardApi.license.enabled | quote }}
+        - name: License__MacAddress
+          value: "/sys/class/net/eth0/address"
+        volumeMounts:
+        - name: licenses
+          mountPath: /app/licenses
+          readOnly: true
+        - name: sys
+          mountPath: /sys
+          readOnly: true
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.guardApi.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.guardApi.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+      volumes:
+      - name: licenses
+        {{- if .Values.persistence.licenses.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ include "poslite-pam.fullname" . }}-licenses
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
+      - name: sys
+        hostPath:
+          path: /sys
+          type: Directory
+      hostname: pam-guard-api
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
+---
+{{- if .Values.guardApi.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "poslite-pam.guardApiService" . }}
+  labels:
+    {{- include "poslite-pam.labels" . | nindent 4 }}
+    component: guard-api
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.guardApi.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "poslite-pam.selectorLabels" . | nindent 4 }}
+    component: guard-api
+{{- end }}

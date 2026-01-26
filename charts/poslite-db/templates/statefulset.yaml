@@ -1,0 +1,158 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "poslite-db.fullname" . }}-postgres
+  labels:
+    {{- include "poslite-db.labels" . | nindent 4 }}
+    component: postgres
+spec:
+  serviceName: {{ include "poslite-db.fullname" . }}-postgres
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "poslite-db.selectorLabels" . | nindent 6 }}
+      component: postgres
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-db.selectorLabels" . | nindent 8 }}
+        component: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: postgres
+          containerPort: {{ .Values.postgresql.port }}
+          hostPort: {{ .Values.postgresql.hostPort }}
+          protocol: TCP
+        env:
+        - name: POSTGRES_USER
+          value: {{ .Values.postgresql.user }}
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "poslite-db.fullname" . }}-secret
+              key: postgres-password
+        - name: POSTGRES_DB
+          value: {{ .Values.postgresql.database }}
+        - name: TZ
+          value: {{ .Values.postgresql.timezone }}
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        command:
+        - postgres
+        - -c
+        - config_file=/etc/postgresql/postgresql.conf
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+        - name: postgresql-config
+          mountPath: /etc/postgresql/postgresql.conf
+          subPath: postgresql.conf
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - pg_isready -U {{ .Values.postgresql.user }} -d {{ .Values.postgresql.database }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - pg_isready -U {{ .Values.postgresql.user }} -d {{ .Values.postgresql.database }}
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+      volumes:
+      - name: postgresql-config
+        configMap:
+          name: {{ include "poslite-db.fullname" . }}-config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "{{ .Values.persistence.accessMode }}" ]
+      {{- if .Values.persistence.storageClass }}
+      storageClassName: {{ .Values.persistence.storageClass }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size }}
+
+---
+{{- if .Values.pgadmin.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-db.fullname" . }}-pgadmin
+  labels:
+    {{- include "poslite-db.labels" . | nindent 4 }}
+    component: pgadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "poslite-db.selectorLabels" . | nindent 6 }}
+      component: pgadmin
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-db.selectorLabels" . | nindent 8 }}
+        component: pgadmin
+    spec:
+      containers:
+      - name: pgadmin
+        image: "{{ .Values.pgadmin.image.repository }}:{{ .Values.pgadmin.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 80
+          hostPort: {{ .Values.pgadmin.hostPort }}
+          protocol: TCP
+        env:
+        - name: PGADMIN_DEFAULT_EMAIL
+          value: {{ .Values.pgadmin.defaultEmail }}
+        - name: PGADMIN_DEFAULT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "poslite-db.fullname" . }}-secret
+              key: pgadmin-password
+        volumeMounts:
+        - name: pgadmin-data
+          mountPath: /var/lib/pgadmin
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+      volumes:
+      - name: pgadmin-data
+        {{- if .Values.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ include "poslite-db.fullname" . }}-pgadmin-data
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
+{{- end }}

@@ -1,0 +1,53 @@
+# Default values for poslite-cloudflared
+image:
+  repository: cloudflare/cloudflared
+  tag: latest
+  pullPolicy: IfNotPresent
+
+replicas: 1
+
+hostNetwork: true
+
+config:
+  tunnelId: ""
+  credentialsFile: ""
+  ingress:
+    - hostname: ""
+      service: http://localhost:10012
+    - hostname: ""
+      service: http://localhost:10014
+    - hostname: ""
+      service: http://localhost:9010
+    - hostname: ""
+      service: http://localhost:9012
+    - hostname: ""
+      service: http://localhost:9014
+    - hostname: ""
+      service: http://localhost:9015
+    - hostname: ""
+      service: http://localhost:9020
+    - hostname: ""
+      service: http://localhost:7010
+    - hostname: ""
+      service: http://localhost:7012
+    - hostname: ""
+      service: http://localhost:7014
+    - hostname: ""
+      service: http://localhost:7015
+    - hostname: ""
+      service: http://localhost:7016
+    - hostname: ""
+      service: http://localhost:7020
+    - service: http_status:404
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

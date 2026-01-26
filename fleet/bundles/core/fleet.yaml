@@ -1,0 +1,22 @@
+defaultNamespace: poslite
+targetCustomizations:
+- name: core
+  clusterSelector:
+    matchLabels:
+      atlas: "true"
+  helm:
+    chart: ../../charts/poslite-core
+    values:
+      portal:
+        enabled: true
+      webapi:
+        enabled: true
+      workers:
+        price:
+          enabled: true
+        shift:
+          enabled: true
+        errorReports:
+          enabled: true
+        ierp:
+          enabled: true

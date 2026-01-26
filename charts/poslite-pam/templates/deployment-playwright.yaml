@@ -1,0 +1,83 @@
+{{- if .Values.playwright.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "poslite-pam.fullname" . }}-playwright
+  labels:
+    {{- include "poslite-pam.labels" . | nindent 4 }}
+    component: playwright
+spec:
+  replicas: {{ .Values.playwright.replicas }}
+  selector:
+    matchLabels:
+      {{- include "poslite-pam.selectorLabels" . | nindent 6 }}
+      component: playwright
+  template:
+    metadata:
+      labels:
+        {{- include "poslite-pam.selectorLabels" . | nindent 8 }}
+        component: playwright
+    spec:
+      containers:
+      - name: playwright
+        image: "{{ .Values.playwright.image.repository }}:{{ .Values.playwright.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: ws
+          containerPort: {{ .Values.playwright.port }}
+          hostPort: {{ .Values.playwright.hostPort }}
+          protocol: TCP
+        securityContext:
+          runAsUser: 1000
+        command:
+        - npx
+        - -y
+        - playwright@1.49.0
+        - run-server
+        - --port
+        - "{{ .Values.playwright.port }}"
+        - --host
+        - "0.0.0.0"
+        workingDir: /home/pwuser
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 512Mi
+      hostname: pam-playwright
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+
+---
+{{- if .Values.playwright.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "poslite-pam.playwrightService" . }}
+  labels:
+    {{- include "poslite-pam.labels" . | nindent 4 }}
+    component: playwright
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.playwright.port }}
+    targetPort: ws
+    protocol: TCP
+    name: ws
+  selector:
+    {{- include "poslite-pam.selectorLabels" . | nindent 4 }}
+    component: playwright
+{{- end }}
