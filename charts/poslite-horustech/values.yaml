@@ -153,7 +153,7 @@ config:
   companyId: 1
   coreApiKey: "TEST"
   horustechApiKey: "TEST"
-  ierpUrl: ""
+  ierpUrl: "http://ierpgateway.azurewebsites.net/"
   horustechIp: ""
   horustechPortWebapi: "857"  # Puerto WebAPI
   horustechPortWorkers: "1771"  # Puerto Workers
