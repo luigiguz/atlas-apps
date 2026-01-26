@@ -155,8 +155,8 @@ config:
   horustechApiKey: "TEST"
   ierpUrl: ""
   horustechIp: ""
-  horustechPortWebapi: ""
-  horustechPortWorkers: ""
+  horustechPortWebapi: "857"  # Puerto WebAPI
+  horustechPortWorkers: "1771"  # Puerto Workers
   horustechTanksIp: ""
   horustechTlsPort: 10002
 
