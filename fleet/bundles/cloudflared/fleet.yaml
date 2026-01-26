@@ -5,7 +5,7 @@ targetCustomizations:
     matchLabels:
       atlas: "true"
   helm:
-    chart: ../../charts/poslite-cloudflared
+    chart: ../../../charts/poslite-cloudflared
     values:
       replicas: 1
       hostNetwork: true

@@ -5,7 +5,7 @@ targetCustomizations:
     matchLabels:
       atlas: "true"
   helm:
-    chart: ../../charts/poslite-core
+    chart: ../../../charts/poslite-core
     values:
       portal:
         enabled: true

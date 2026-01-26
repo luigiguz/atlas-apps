@@ -6,7 +6,7 @@ targetCustomizations:
       atlas: "true"
       poslite: "pam"
   helm:
-    chart: ../../charts/poslite-pam
+    chart: ../../../charts/poslite-pam
     values:
       guardApi:
         enabled: true

@@ -5,7 +5,7 @@ targetCustomizations:
     matchLabels:
       atlas: "true"
   helm:
-    chart: ../../charts/poslite-db
+    chart: ../../../charts/poslite-db
     values:
       postgresql:
         password: ""
