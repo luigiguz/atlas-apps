@@ -5,7 +5,9 @@ targetCustomizations:
     matchLabels:
       atlas: "true"
   helm:
-    chart: ../../../charts/poslite-cloudflared
+    chart: poslite-cloudflared
+    repo: oci://aspposlite.azurecr.io/helm
+    version: 1.0.0
     values:
       replicas: 1
       hostNetwork: true

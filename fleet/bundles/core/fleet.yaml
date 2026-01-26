@@ -5,7 +5,9 @@ targetCustomizations:
     matchLabels:
       atlas: "true"
   helm:
-    chart: ../../../charts/poslite-core
+    chart: poslite-core
+    repo: oci://aspposlite.azurecr.io/helm
+    version: 1.0.0
     values:
       portal:
         enabled: true

@@ -6,7 +6,9 @@ targetCustomizations:
       atlas: "true"
       poslite: "horustech"
   helm:
-    chart: ../../../charts/poslite-horustech
+    chart: poslite-horustech
+    repo: oci://aspposlite.azurecr.io/helm
+    version: 1.0.0
     values:
       guardApi:
         enabled: true

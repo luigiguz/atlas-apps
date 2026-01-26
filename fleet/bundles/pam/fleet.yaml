@@ -6,7 +6,9 @@ targetCustomizations:
       atlas: "true"
       poslite: "pam"
   helm:
-    chart: ../../../charts/poslite-pam
+    chart: poslite-pam
+    repo: oci://aspposlite.azurecr.io/helm
+    version: 1.0.0
     values:
       guardApi:
         enabled: true
