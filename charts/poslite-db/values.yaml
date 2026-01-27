@@ -18,7 +18,7 @@ pgadmin:
 
 postgresql:
   user: sa
-  password: ""
+  password: "z@a?ALGm^=u6[8f]Ks5]"
   database: poslite
   port: 5432
   hostPort: 5432
