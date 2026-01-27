@@ -10,9 +10,32 @@ targetCustomizations:
     version: 1.0.0
     values:
       postgresql:
-        password: ""
+        password: "z@a?ALGm^=u6[8f]Ks5]"
         timezone: "America/Panama"
+        database: poslite
+        user: sa
       persistence:
+        enabled: true
         storageClass: local-path
+        size: 20Gi
+        accessMode: ReadWriteOnce
       pgadmin:
         enabled: true
+        defaultPassword: "admin"
+      configMap:
+        postgresqlConf: |
+          listen_addresses = '*'
+          shared_buffers = 512MB
+          effective_cache_size = 2GB
+          maintenance_work_mem = 128MB
+          checkpoint_completion_target = 0.7
+          wal_buffers = 16MB
+          default_statistics_target = 100
+          random_page_cost = 1.1
+          effective_io_concurrency = 200
+          work_mem = 16MB
+          min_wal_size = 1GB
+          max_wal_size = 2GB
+          max_worker_processes = 4
+          max_parallel_workers_per_gather = 2
+          timezone = America/Panama
