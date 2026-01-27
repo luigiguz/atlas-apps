@@ -41,16 +41,28 @@ spec:
           value: {{ .Values.postgresql.timezone }}
         - name: PGDATA
           value: /var/lib/postgresql/data/pgdata
-        command:
-        - postgres
-        - -c
-        - config_file=/etc/postgresql/postgresql.conf
         volumeMounts:
         - name: data
           mountPath: /var/lib/postgresql/data
         - name: postgresql-config
-          mountPath: /etc/postgresql/postgresql.conf
-          subPath: postgresql.conf
+          mountPath: /etc/postgresql-config
+          readOnly: true
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - |
+                # Esperar a que PostgreSQL se inicialice
+                sleep 5
+                # Copiar configuración después de inicialización si no existe
+                if [ -f /etc/postgresql-config/postgresql.conf ] && [ ! -f "$PGDATA/postgresql.conf" ] && [ -f "$PGDATA/PG_VERSION" ]; then
+                  echo "Copiando configuración de PostgreSQL después de inicialización..."
+                  cp /etc/postgresql-config/postgresql.conf "$PGDATA/postgresql.conf"
+                  chmod 600 "$PGDATA/postgresql.conf"
+                  echo "Configuración copiada. Reinicia el pod para aplicar cambios."
+                fi
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         livenessProbe:
