@@ -135,7 +135,7 @@ spec:
       containers:
       - name: pgadmin
         image: "{{ .Values.pgadmin.image.repository }}:{{ .Values.pgadmin.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - name: http
           containerPort: 80

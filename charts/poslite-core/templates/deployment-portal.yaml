@@ -25,7 +25,7 @@ spec:
       containers:
       - name: portal
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.portal.image.repository }}:{{ .Values.portal.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         ports:
         - name: http
           containerPort: {{ .Values.portal.port }}

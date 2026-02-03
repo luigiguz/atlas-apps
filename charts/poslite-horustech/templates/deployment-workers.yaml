@@ -28,7 +28,7 @@ spec:
       containers:
       - name: worker
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.price.image.repository }}:{{ .Values.workers.price.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         securityContext:
           runAsUser: 0
         env:
@@ -90,7 +90,7 @@ spec:
       containers:
       - name: worker
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.shift.image.repository }}:{{ .Values.workers.shift.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         securityContext:
           runAsUser: 0
         env:
@@ -156,7 +156,7 @@ spec:
       containers:
       - name: worker
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.errorReports.image.repository }}:{{ .Values.workers.errorReports.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         securityContext:
           runAsUser: 0
         env:
@@ -242,7 +242,7 @@ spec:
       containers:
       - name: worker
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.dispatches.image.repository }}:{{ .Values.workers.dispatches.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         securityContext:
           runAsUser: 0
         env:
@@ -322,7 +322,7 @@ spec:
       containers:
       - name: worker
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.tanks.image.repository }}:{{ .Values.workers.tanks.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         securityContext:
           runAsUser: 0
         env:
@@ -398,7 +398,7 @@ spec:
       containers:
       - name: worker
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.dispatchesToInvoice.image.repository }}:{{ .Values.workers.ierp.dispatchesToInvoice.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         securityContext:
           runAsUser: 0
         env:
@@ -466,7 +466,7 @@ spec:
       containers:
       - name: worker
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.dispatchPayments.image.repository }}:{{ .Values.workers.ierp.dispatchPayments.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         securityContext:
           runAsUser: 0
         env:
@@ -538,7 +538,7 @@ spec:
       containers:
       - name: worker
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.invoicesToIerp.image.repository }}:{{ .Values.workers.ierp.invoicesToIerp.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         securityContext:
           runAsUser: 0
         env:
@@ -608,7 +608,7 @@ spec:
       containers:
       - name: worker
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.customers.image.repository }}:{{ .Values.workers.ierp.customers.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         securityContext:
           runAsUser: 0
         env:
@@ -678,7 +678,7 @@ spec:
       containers:
       - name: worker
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.markets.image.repository }}:{{ .Values.workers.ierp.markets.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         securityContext:
           runAsUser: 0
         env:
@@ -748,7 +748,7 @@ spec:
       containers:
       - name: worker
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.basicData.image.repository }}:{{ .Values.workers.ierp.basicData.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         securityContext:
           runAsUser: 0
         env:
@@ -818,7 +818,7 @@ spec:
       containers:
       - name: worker
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.invoiceSeries.image.repository }}:{{ .Values.workers.ierp.invoiceSeries.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         securityContext:
           runAsUser: 0
         env:
@@ -888,7 +888,7 @@ spec:
       containers:
       - name: worker
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.workers.ierp.products.image.repository }}:{{ .Values.workers.ierp.products.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         securityContext:
           runAsUser: 0
         env:

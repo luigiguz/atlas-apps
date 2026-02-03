@@ -1,6 +1,7 @@
 # Default values for poslite-core
 imageRegistry: aspposlite.azurecr.io
 imageRepository: asptg.com/ierpposlite
+pullPolicy: Always
 
 portal:
   enabled: true

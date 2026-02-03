@@ -215,6 +215,7 @@ helm install --dry-run --debug poslite-db ./charts/poslite-db -n poslite
 
 - [Publicar charts en ACR](doc/PUBLICAR-CHARTS-ACR.md) — publicación manual y con GitHub Actions.
 - [Contexto estructura atlas-stores](doc/CONTEXTO-ESTRUCTURA-ATLAS-STORES.md) — cómo organizar Fleet y bundles por tienda.
+- [Qué se crea en Rancher por tienda](doc/RECURSOS-RANCHER-POR-TIENDA.md) — Deployments, StatefulSet, PVCs, Secrets, ConfigMaps por chart y tipo de tienda.
 - [Reparar PostgreSQL](doc/REPARAR-POSTGRES.md) — resolución de problemas con poslite-db.
 
 ## Contacto

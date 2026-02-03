@@ -1,6 +1,7 @@
 # Default values for poslite-horustech
 imageRegistry: aspposlite.azurecr.io
 imageRepository: asptg.com/ierpposlite
+pullPolicy: Always
 
 # Guard API
 guardApi:

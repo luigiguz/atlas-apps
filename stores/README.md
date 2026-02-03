@@ -28,6 +28,8 @@ Cada subcarpeta incluye:
 - **fleet.yaml**: bundle con `clusterSelector` que exige `store`. Core solo para tienda-core; PAM/Horustech solo db + cloudflared-xxx + pam/horustech (sin core).
 - **README.md**, **values-db.yaml**, **values-*.yaml**: referencia; los valores usados por Fleet están ya en `fleet.yaml`.
 
+Al desplegar una tienda, Fleet crea en Rancher (namespace `poslite`) Deployments, StatefulSet, PVCs, Secrets y ConfigMaps; el detalle por chart y por tipo de tienda está en [doc/RECURSOS-RANCHER-POR-TIENDA.md](../doc/RECURSOS-RANCHER-POR-TIENDA.md).
+
 ## Uso
 
 1. Asegúrate de que los charts estén publicados en ACR (véase [doc/PUBLICAR-CHARTS-ACR.md](../doc/PUBLICAR-CHARTS-ACR.md)).

@@ -25,7 +25,7 @@ spec:
       containers:
       - name: webapi
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.coreWebapi.image.repository }}:{{ .Values.coreWebapi.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         ports:
         - name: http
           containerPort: {{ .Values.coreWebapi.port }}

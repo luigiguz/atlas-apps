@@ -21,7 +21,7 @@ spec:
       containers:
       - name: playwright
         image: "{{ .Values.playwright.image.repository }}:{{ .Values.playwright.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         ports:
         - name: ws
           containerPort: {{ .Values.playwright.port }}

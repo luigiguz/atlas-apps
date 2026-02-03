@@ -1,6 +1,7 @@
 # Default values for poslite-pam
 imageRegistry: aspposlite.azurecr.io
 imageRepository: asptg.com/ierpposlite
+pullPolicy: Always
 
 # Guard API (solo en new-compose)
 guardApi:

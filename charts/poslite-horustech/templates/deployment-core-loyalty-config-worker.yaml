@@ -28,7 +28,7 @@ spec:
       containers:
       - name: worker
         image: "{{ .Values.imageRegistry }}/{{ .Values.imageRepository }}/{{ .Values.coreLoyaltyConfigWorker.image.repository }}:{{ .Values.coreLoyaltyConfigWorker.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.pullPolicy | default "Always" }}
         securityContext:
           runAsUser: 0
         ports:
