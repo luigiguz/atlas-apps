@@ -55,6 +55,13 @@ playwright:
   port: 3320
   hostPort: 7011
   replicas: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
 
 # Core WebAPI
 coreWebapi:
@@ -205,11 +212,11 @@ imagePullSecrets:
 
 resources:
   limits:
-    cpu: 1000m
-    memory: 1Gi
+    cpu: 400m
+    memory: 384Mi
   requests:
-    cpu: 200m
-    memory: 256Mi
+    cpu: 50m
+    memory: 128Mi
 
 nodeSelector: {}
 tolerations: []

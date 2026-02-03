@@ -40,12 +40,7 @@ spec:
         - "0.0.0.0"
         workingDir: /home/pwuser
         resources:
-          limits:
-            cpu: 2000m
-            memory: 2Gi
-          requests:
-            cpu: 500m
-            memory: 512Mi
+          {{- toYaml .Values.playwright.resources | nindent 10 }}
       hostname: pam-playwright
       {{- with .Values.nodeSelector }}
       nodeSelector:

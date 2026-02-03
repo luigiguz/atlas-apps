@@ -17,6 +17,7 @@ Ejemplo: al copiar `tienda-pam-ejemplo` obtienes `atlas-stores/fleet/bundles/sto
 | Carpeta | Stack | Charts desplegados | Labels del cluster (obligatorios) |
 |--------|--------|-------------------|------------------------------------|
 | **tienda-core-ejemplo** | Solo Core | db, core, cloudflared-core | `atlas: "true"`, `store: "tienda-core-ejemplo"` |
+| **tienda-core-ejemplo-rpi** | Solo Core (Raspberry Pi) | db, core, cloudflared-core (recursos bajos) | `atlas: "true"`, `store: "tienda-core-ejemplo-rpi"` |
 | **tienda-pam-ejemplo** | PAM (autosuficiente, sin core) | db, cloudflared-pam, pam | `atlas: "true"`, `store: "tienda-pam-ejemplo"` |
 | **tienda-horustech-ejemplo** | Horustech (autosuficiente, sin core) | db, cloudflared-horustech, horustech | `atlas: "true"`, `store: "tienda-horustech-ejemplo"` |
 
