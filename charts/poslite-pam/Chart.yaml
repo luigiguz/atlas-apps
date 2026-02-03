@@ -1,6 +1,6 @@
 apiVersion: v2
 name: poslite-pam
-description: PAM services for PosLite
+description: Stack PAM completo (portal, coreWebapi, workers, ierp, etc.). Autosuficiente; para tiendas PAM desplegar solo este chart con db y cloudflared-pam, sin poslite-core.
 type: application
 version: 1.0.0
 appVersion: "1.0"

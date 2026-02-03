@@ -2,7 +2,7 @@
 imageRegistry: aspposlite.azurecr.io
 imageRepository: asptg.com/ierpposlite
 
-# Guard API (solo en new-compose)
+# Guard API
 guardApi:
   enabled: true
   image:

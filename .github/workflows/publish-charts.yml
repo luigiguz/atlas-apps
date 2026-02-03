@@ -1,0 +1,53 @@
+# Publica los Helm charts de PosLite en Azure Container Registry (OCI).
+# Requiere secrets: ACR_REGISTRY (atlashelmrepo.azurecr.io), ACR_USERNAME, ACR_PASSWORD
+name: Publish Helm charts to ACR
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+    paths:
+      - 'charts/**'
+
+env:
+  ACR_REGISTRY: atlashelmrepo.azurecr.io
+  HELM_EXPERIMENTAL_OCI: 1
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'v3.16.0'
+
+      - name: Login to ACR
+        uses: azure/docker-login@v2
+        with:
+          login-server: ${{ env.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Configure Helm for OCI
+        run: |
+          echo "${{ secrets.ACR_PASSWORD }}" | helm registry login ${{ env.ACR_REGISTRY }} --username ${{ secrets.ACR_USERNAME }} --password-stdin
+
+      - name: Package and push charts
+        run: |
+          cd charts
+          for dir in poslite-db poslite-core poslite-pam poslite-horustech \
+            poslite-cloudflared-core poslite-cloudflared-pam poslite-cloudflared-horustech; do
+            if [ -d "$dir" ]; then
+              echo "Packaging $dir..."
+              helm package "$dir"
+              tgz=$(ls -t ${dir}-*.tgz 2>/dev/null | head -1)
+              if [ -n "$tgz" ]; then
+                helm push "$tgz" "oci://${{ env.ACR_REGISTRY }}/helm"
+                echo "Pushed $tgz"
+              fi
+            fi
+          done

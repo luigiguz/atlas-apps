@@ -1,6 +1,6 @@
 apiVersion: v2
 name: poslite-core
-description: Core services for PosLite (Portal, WebAPI, Workers)
+description: Core stack (Portal, WebAPI, Workers con ierp) para tiendas solo-Core. No desplegar junto a poslite-pam ni poslite-horustech.
 type: application
 version: 1.0.0
 appVersion: "1.0"

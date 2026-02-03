@@ -70,10 +70,13 @@ atlas-stores/
 │       ├── values-db.yaml
 │       ├── values-pam.yaml  (o values-horustech.yaml)
 │       └── secrets.sops.yaml
-└── groups/
-    ├── pilot.yaml
-    ├── wave1.yaml
-    └── wave2.yaml
+└── fleet/
+    └── bundles/
+        ├── db/
+        ├── core/
+        ├── cloudflared/
+        ├── pam/
+        └── horustech/
 ```
 
 ---
@@ -168,9 +171,8 @@ Ejemplos:
 
 - Fleet despliega por labels:
   - atlas=true
-  - store=<tienda>
-  - poslite=pam | horustech
-  - wave=pilot | wave1 | wave2
+  - store=<tienda> (opcional)
+  - poslite=pam | horustech (solo si aplica)
 - Deploy = commit en Git
 - Rollback = git revert
 

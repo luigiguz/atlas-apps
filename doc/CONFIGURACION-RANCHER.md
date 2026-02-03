@@ -56,8 +56,7 @@ Cada cluster debe tener además:
 
 ```yaml
 store: "<nombre-tienda>"    # Nombre único de la tienda (ej: "tienda-1", "gasolinera-central")
-poslite: "pam"             # o "horustech" - Define qué stack se despliega
-wave: "pilot"              # o "wave1", "wave2" - Define la fase de migración
+poslite: "pam"             # o "horustech" - Define qué stack se despliega (solo si aplica)
 ```
 
 #### Ejemplos de Configuración de Labels
@@ -67,7 +66,6 @@ wave: "pilot"              # o "wave1", "wave2" - Define la fase de migración
 atlas: "true"
 store: "tienda-1"
 poslite: "pam"
-wave: "pilot"
 ```
 
 **Cluster con Horustech:**
@@ -75,7 +73,12 @@ wave: "pilot"
 atlas: "true"
 store: "tienda-2"
 poslite: "horustech"
-wave: "wave1"
+```
+
+**Cluster base (db + core + cloudflared):**
+```yaml
+atlas: "true"
+store: "tienda-1"
 ```
 
 #### Cómo Fleet Usa las Labels
@@ -83,64 +86,7 @@ wave: "wave1"
 - **`atlas: "true"`**: Requerido por todos los bundles (db, core, cloudflared). Identifica que el cluster pertenece a Atlas.
 - **`poslite: "pam"`**: Bundle `pam` se despliega solo en clusters con este label. Define qué stack de aplicación se ejecuta.
 - **`poslite: "horustech"`**: Bundle `horustech` se despliega solo en clusters con este label. Define qué stack de aplicación se ejecuta.
-- **`store`**: Identificador único de la tienda (usado para configuración específica y tracking).
-- **`wave`**: Usado para organizar tiendas en fases de migración. **Es opcional** pero muy recomendado para gestión gradual.
-
-#### ¿Qué es la Label `wave` y Cómo Funciona?
-
-La label `wave` permite organizar la migración en **fases controladas**. No es estrictamente necesaria para que los bundles se desplieguen (los bundles principales solo requieren `atlas: "true"` y `poslite: "pam"`/`"horustech"`), pero es muy útil para:
-
-**1. Organización de Fases de Migración:**
-```
-pilot  → Tiendas piloto (pruebas iniciales, validación)
-wave1  → Primera ola de migración (tiendas seleccionadas)
-wave2  → Segunda ola de migración (expansión)
-```
-
-**2. Aplicar Configuraciones por Fase:**
-Los archivos en `atlas-stores/groups/` (pilot.yaml, wave1.yaml, wave2.yaml) pueden usar `wave` para aplicar configuraciones específicas a cada fase:
-
-```yaml
-# groups/pilot.yaml
-targetCustomizations:
-- name: pilot-stores
-  clusterSelector:
-    matchLabels:
-      atlas: "true"
-      wave: "pilot"    # ← Solo clusters con wave=pilot
-  helm:
-    chart: ../../atlas-apps/fleet/bundles/db
-    values:
-      # Configuración específica para pilot
-```
-
-**3. Control de Ritmo de Migración:**
-- Permite migrar tiendas en grupos controlados
-- Facilita el rollback si hay problemas en una fase
-- Permite aplicar configuraciones diferentes por fase
-
-**4. Tracking y Monitoreo:**
-- Identificar fácilmente en qué fase está cada tienda
-- Filtrar clusters por fase en Rancher
-- Generar reportes por fase
-
-**Ejemplo de Uso:**
-
-```yaml
-# Cluster en fase piloto
-atlas: "true"
-store: "tienda-piloto-1"
-poslite: "pam"
-wave: "pilot"    # ← Identifica que está en fase piloto
-
-# Después de validar, mover a wave1
-wave: "wave1"    # ← Cambiar label para mover a siguiente fase
-```
-
-**Nota Importante:**
-- Los bundles principales (`db`, `core`, `pam`, `horustech`, `cloudflared`) **NO requieren** la label `wave` para funcionar.
-- La label `wave` es principalmente para **organización y gestión de fases**.
-- Si usas los archivos de grupos (`groups/pilot.yaml`, etc.), entonces `wave` sí es necesaria para esos grupos específicos.
+- **`store`**: Identificador único de la tienda (usado para configuración específica y tracking). Opcional.
 
 **Nota:** Las labels deben aplicarse **antes** de que Fleet intente desplegar. Si un cluster no tiene las labels correctas, los bundles no se aplicarán automáticamente.
 
@@ -289,7 +235,7 @@ Agrega los siguientes labels:
 atlas: "true"
 store: "tienda-1"              # Nombre de la tienda
 poslite: "pam"                 # o "horustech"
-wave: "pilot"                  # o "wave1", "wave2"
+# store y poslite según corresponda
 ```
 
 **Ejemplo visual en Rancher UI:**
@@ -298,7 +244,6 @@ Labels:
   atlas = true
   store = tienda-1
   poslite = pam
-  wave = pilot
 ```
 
 ### Paso 3: Guardar Cambios
@@ -631,7 +576,6 @@ git push
    atlas: "true"
    store: "nueva-tienda"
    poslite: "pam"  # o "horustech"
-   wave: "pilot"
    ```
 
 4. **Fleet despliega automáticamente**
@@ -649,7 +593,7 @@ Usa este checklist para asegurarte de que todo esté configurado:
   - [ ] `atlas: "true"`
   - [ ] `store: "<nombre>"`
   - [ ] `poslite: "pam"` o `"horustech"`
-  - [ ] `wave: "pilot"` o `"wave1"` o `"wave2"`
+  - [ ] Labels `store` y `poslite` según corresponda
 - [ ] SOPS configurado (si se usan secretos encriptados)
 - [ ] Bundles aparecen en Fleet
 - [ ] Bundles se aplican a clusters correctos

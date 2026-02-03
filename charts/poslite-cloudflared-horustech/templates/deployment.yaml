@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "poslite-cloudflared.fullname" . }}
+  name: {{ include "poslite-cloudflared-horustech.fullname" . }}
   labels:
-    {{- include "poslite-cloudflared.labels" . | nindent 4 }}
+    {{- include "poslite-cloudflared-horustech.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      {{- include "poslite-cloudflared.selectorLabels" . | nindent 6 }}
+      {{- include "poslite-cloudflared-horustech.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "poslite-cloudflared.selectorLabels" . | nindent 8 }}
+        {{- include "poslite-cloudflared-horustech.selectorLabels" . | nindent 8 }}
     spec:
       hostNetwork: {{ .Values.hostNetwork }}
       containers:
@@ -40,11 +40,11 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: {{ include "poslite-cloudflared.fullname" . }}-config
+          name: {{ include "poslite-cloudflared-horustech.fullname" . }}-config
       {{- if .Values.config.credentialsFile }}
       - name: credentials
         secret:
-          secretName: {{ include "poslite-cloudflared.fullname" . }}-credentials
+          secretName: {{ include "poslite-cloudflared-horustech.fullname" . }}-credentials
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

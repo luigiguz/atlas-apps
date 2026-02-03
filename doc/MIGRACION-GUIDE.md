@@ -35,16 +35,19 @@ Contiene la configuración específica de cada tienda:
 
 ```
 atlas-stores/
-├── stores/
-│   └── <nombre-tienda>/
-│       ├── values-common.yaml
-│       ├── values-db.yaml
-│       ├── values-pam.yaml  (o values-horustech.yaml)
-│       └── secrets.sops.yaml
-└── groups/
-    ├── pilot.yaml
-    ├── wave1.yaml
-    └── wave2.yaml
+├── fleet/
+│   └── bundles/
+│       ├── db/
+│       ├── core/
+│       ├── cloudflared/
+│       ├── pam/
+│       └── horustech/
+└── stores/
+    └── <nombre-tienda>/
+        ├── values-common.yaml
+        ├── values-db.yaml
+        ├── values-pam.yaml  (o values-horustech.yaml)
+        └── secrets.sops.yaml
 ```
 
 ## Puertos (CONGELADOS - NO MODIFICAR)
@@ -120,7 +123,8 @@ labels:
   atlas: "true"
   store: "<nombre-tienda>"
   poslite: "pam" | "horustech"
-  wave: "pilot" | "wave1" | "wave2"
+  store: "<nombre-tienda>"   # opcional
+  poslite: "pam" | "horustech"   # solo si aplica
 ```
 
 ## Proceso de Migración

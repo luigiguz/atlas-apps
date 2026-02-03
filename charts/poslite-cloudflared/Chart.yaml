@@ -1,6 +1,0 @@
-apiVersion: v2
-name: poslite-cloudflared
-description: Cloudflared tunnel for PosLite
-type: application
-version: 1.0.0
-appVersion: "latest"

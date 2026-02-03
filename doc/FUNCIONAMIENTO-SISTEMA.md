@@ -197,13 +197,18 @@ Este repositorio contiene la configuración **específica** de cada tienda.
 
 ```
 atlas-stores/
-├── stores/
-│   └── tienda-1/
-│       ├── values-db.yaml          # Config BD para esta tienda
-│       ├── values-pam.yaml         # Config PAM para esta tienda
-│       └── secrets.sops.yaml       # Secretos encriptados
-└── groups/
-    └── pilot.yaml                  # Grupos de tiendas
+├── fleet/
+│   └── bundles/
+│       ├── db/
+│       ├── core/
+│       ├── cloudflared/
+│       ├── pam/
+│       └── horustech/
+└── stores/
+    └── tienda-1/
+        ├── values-db.yaml          # Config BD para esta tienda
+        ├── values-pam.yaml         # Config PAM para esta tienda
+        └── secrets.sops.yaml       # Secretos encriptados
 ```
 
 #### Ejemplo: Configuración de una Tienda

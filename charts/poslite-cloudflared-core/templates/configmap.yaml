@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "poslite-cloudflared.fullname" . }}-config
+  name: {{ include "poslite-cloudflared-core.fullname" . }}-config
   labels:
-    {{- include "poslite-cloudflared.labels" . | nindent 4 }}
+    {{- include "poslite-cloudflared-core.labels" . | nindent 4 }}
 data:
   config.yaml: |
     tunnel: {{ .Values.config.tunnelId }}

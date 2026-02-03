@@ -96,17 +96,25 @@ Migracion/
 │
 └── atlas-stores/                     # Repositorio de configuración por tienda
     ├── README.md
-    ├── stores/
-    │   └── ejemplo-tienda/
-    │       ├── values-common.yaml    # ✅ COMPLETO
-    │       ├── values-db.yaml        # ✅ COMPLETO
-    │       ├── values-pam.yaml       # ✅ COMPLETO
-    │       ├── values-horustech.yaml # ✅ COMPLETO
-    │       └── secrets.sops.yaml.example # ✅ COMPLETO
-    └── groups/
-        ├── pilot.yaml                # ✅ COMPLETO
-        ├── wave1.yaml                # ✅ COMPLETO
-        └── wave2.yaml                # ✅ COMPLETO
+    ├── fleet/
+    │   └── bundles/
+    │       ├── db/
+    │       │   └── fleet.yaml
+    │       ├── core/
+    │       │   └── fleet.yaml
+    │       ├── cloudflared/
+    │       │   └── fleet.yaml
+    │       ├── pam/
+    │       │   └── fleet.yaml
+    │       └── horustech/
+    │           └── fleet.yaml
+    └── stores/
+        └── ejemplo-tienda/
+            ├── values-common.yaml    # ✅ COMPLETO
+            ├── values-db.yaml        # ✅ COMPLETO
+            ├── values-pam.yaml       # ✅ COMPLETO
+            ├── values-horustech.yaml # ✅ COMPLETO
+            └── secrets.sops.yaml.example # ✅ COMPLETO
 ```
 
 ## Estado de Completitud
@@ -134,8 +142,8 @@ Migracion/
    - Configuración de targetCustomizations
 
 5. **Estructura atlas-stores**: 100%
-   - Templates de configuración por tienda
-   - Grupos de despliegue (pilot, wave1, wave2)
+   - Fleet bundles por chart (db, core, cloudflared, pam, horustech)
+   - Configuración por tienda en stores/
    - Documentación
 
 6. **Documentación**: 100%
@@ -230,9 +238,8 @@ Todos los templates han sido creados basándose en `new-compose.yaml`:
    - Aplicar labels a clusters de prueba
 
 6. **Migración gradual**:
-   - Empezar con tiendas piloto
-   - Validar funcionamiento
-   - Expandir a wave1 y wave2
+   - Desplegar por tipo de chart (db, core, etc.) según labels del cluster
+   - Validar funcionamiento por tienda
 
 ## Notas Importantes
 

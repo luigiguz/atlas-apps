@@ -1,0 +1,37 @@
+# PosLite Cloudflared - Core + BD only (puertos 10012, 10014, 5050, 5432)
+image:
+  repository: cloudflare/cloudflared
+  tag: latest
+  pullPolicy: IfNotPresent
+
+replicas: 1
+hostNetwork: true
+
+config:
+  tunnelId: ""
+  credentialsFile: ""
+  ingress:
+    # Core
+    - hostname: ""
+      service: http://localhost:10012
+    - hostname: ""
+      service: http://localhost:10014
+    # BD (pgadmin)
+    - hostname: ""
+      service: http://localhost:5050
+    # BD (postgres TCP)
+    - hostname: ""
+      service: tcp://localhost:5432
+    - service: http_status:404
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
