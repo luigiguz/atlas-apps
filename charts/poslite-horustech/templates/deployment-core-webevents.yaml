@@ -45,15 +45,13 @@ spec:
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         livenessProbe:
-          httpGet:
-            path: /health
+          tcpSocket:
             port: {{ .Values.coreWebevents.port }}
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
         readinessProbe:
-          httpGet:
-            path: /health
+          tcpSocket:
             port: {{ .Values.coreWebevents.port }}
           initialDelaySeconds: 10
           periodSeconds: 5
