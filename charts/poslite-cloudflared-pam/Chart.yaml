@@ -1,6 +1,0 @@
-apiVersion: v2
-name: poslite-cloudflared-pam
-description: Cloudflared tunnel for PosLite PAM + BD only
-type: application
-version: 1.0.0
-appVersion: "latest"

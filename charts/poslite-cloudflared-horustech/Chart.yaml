@@ -1,6 +1,0 @@
-apiVersion: v2
-name: poslite-cloudflared-horustech
-description: Cloudflared tunnel for PosLite Horustech + BD only
-type: application
-version: 1.0.0
-appVersion: "latest"

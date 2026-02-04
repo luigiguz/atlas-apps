@@ -1,6 +1,0 @@
-apiVersion: v2
-name: poslite-cloudflared-core
-description: Cloudflared tunnel for PosLite Core + BD only
-type: application
-version: 1.0.0
-appVersion: "latest"
