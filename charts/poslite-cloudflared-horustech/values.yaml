@@ -9,7 +9,15 @@ hostNetwork: true
 
 config:
   tunnelId: ""
+  # Opción 1: contenido JSON del archivo de credenciales (generado con: cloudflared tunnel create <name>).
+  # Se crea un Secret en el chart. Para valores sensibles en Fleet usa un Secret externo y deja esto vacío.
+  credentials: ""
+  # Opción 2: si no usas credentials, pon aquí cualquier valor no vacío y crea tú el Secret
+  # <release>-credentials con clave credentials.json (ej: kubectl create secret generic ... --from-file=credentials.json=...)
   credentialsFile: ""
+  # Opción 3: ruta en el nodo donde está el .json (ej. /root/.cloudflared). Se monta <credentialsHostPath>/<tunnelId>.json.
+  # El pod debe programarse en ese nodo (nodeSelector). Si se define, no uses credentials ni credentialsFile.
+  credentialsHostPath: ""
   ingress:
     # Horustech
     - hostname: ""

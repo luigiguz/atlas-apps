@@ -29,10 +29,12 @@ spec:
         - name: config
           mountPath: /etc/cloudflared
           readOnly: true
-        {{- if .Values.config.credentialsFile }}
+        {{- if or .Values.config.credentials .Values.config.credentialsFile .Values.config.credentialsHostPath }}
         - name: credentials
           mountPath: /etc/cloudflared/credentials.json
+          {{- if not .Values.config.credentialsHostPath }}
           subPath: credentials.json
+          {{- end }}
           readOnly: true
         {{- end }}
         resources:
@@ -41,7 +43,12 @@ spec:
       - name: config
         configMap:
           name: {{ include "poslite-cloudflared-horustech.fullname" . }}-config
-      {{- if .Values.config.credentialsFile }}
+      {{- if .Values.config.credentialsHostPath }}
+      - name: credentials
+        hostPath:
+          path: {{ .Values.config.credentialsHostPath }}/{{ .Values.config.tunnelId }}.json
+          type: File
+      {{- else if or .Values.config.credentials .Values.config.credentialsFile }}
       - name: credentials
         secret:
           secretName: {{ include "poslite-cloudflared-horustech.fullname" . }}-credentials
