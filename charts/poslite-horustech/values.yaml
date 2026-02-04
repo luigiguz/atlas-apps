@@ -176,7 +176,7 @@ persistence:
     enabled: true
     storageClass: local-path
     size: 1Gi
-    accessMode: ReadOnlyMany
+    accessMode: ReadWriteOnce
 
 imagePullSecrets:
   - name: acr-secret
