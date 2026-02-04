@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.postgres.serviceName }}
+  labels:
+    {{- include "poslite-db.labels" . | nindent 4 }}
+    component: postgres
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: postgres
+      port: {{ .Values.postgresql.port }}
+      targetPort: postgres
+      protocol: TCP
+  selector:
+    {{- include "poslite-db.selectorLabels" . | nindent 4 }}
+    component: postgres

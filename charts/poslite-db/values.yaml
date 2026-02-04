@@ -23,6 +23,10 @@ pgadmin:
       cpu: 50m
       memory: 64Mi
 
+postgres:
+  # Nombre del Service headless para el StatefulSet (DNS: <pod>.<serviceName>.<ns>.svc.cluster.local)
+  serviceName: poslite-postgres-db
+
 postgresql:
   user: sa
   password: "z@a?ALGm^=u6[8f]Ks5]"
