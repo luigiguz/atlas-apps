@@ -166,7 +166,7 @@ persistence:
     enabled: true
     storageClass: local-path
     size: 10Gi
-    accessMode: ReadWriteMany
+    accessMode: ReadWriteOnce
   pointer:
     enabled: true
     storageClass: local-path
