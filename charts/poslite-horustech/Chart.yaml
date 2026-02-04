@@ -1,5 +1,5 @@
 apiVersion: v2
-name: poslite-horustech
+name: poslite-ht
 description: Stack Horustech completo (portal, webapi, coreWebapi, workers, ierp, etc.). Autosuficiente; para tiendas Horustech desplegar solo este chart con db y cloudflared-horustech, sin poslite-core.
 type: application
 version: 1.0.0
