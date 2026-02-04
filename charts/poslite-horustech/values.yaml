@@ -83,7 +83,7 @@ workers:
   errorReports:
     enabled: true
     image:
-      repository: ierpposlite/ierp/dataworker
+      repository: horustech/dataworker
       tag: latest
     replicas: 1
   dispatches:
@@ -103,49 +103,49 @@ workers:
     dispatchesToInvoice:
       enabled: true
       image:
-        repository: ierpposlite/ierp/dataworker
+        repository: horustech/dataworker
         tag: latest
       replicas: 1
     dispatchPayments:
       enabled: true
       image:
-        repository: ierpposlite/ierp/dataworker
+        repository: horustech/dataworker
         tag: latest
       replicas: 1
     invoicesToIerp:
       enabled: true
       image:
-        repository: ierpposlite/ierp/dataworker
+        repository: horustech/dataworker
         tag: latest
       replicas: 1
     customers:
       enabled: true
       image:
-        repository: ierpposlite/ierp/dataworker
+        repository: horustech/dataworker
         tag: latest
       replicas: 1
     markets:
       enabled: true
       image:
-        repository: ierpposlite/ierp/dataworker
+        repository: horustech/dataworker
         tag: latest
       replicas: 1
     basicData:
       enabled: true
       image:
-        repository: ierpposlite/ierp/dataworker
+        repository: horustech/dataworker
         tag: latest
       replicas: 1
     invoiceSeries:
       enabled: true
       image:
-        repository: ierpposlite/ierp/dataworker
+        repository: horustech/dataworker
         tag: latest
       replicas: 1
     products:
       enabled: true
       image:
-        repository: ierpposlite/ierp/dataworker
+        repository: horustech/dataworker
         tag: latest
       replicas: 1
 
