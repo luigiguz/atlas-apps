@@ -7,11 +7,7 @@ metadata:
 data:
   config.yaml: |
     tunnel: {{ .Values.config.tunnelId }}
-    {{- if .Values.config.credentialsHostPath }}
-    credentials-file: /etc/cloudflared/host-credentials/{{ .Values.config.tunnelId }}.json
-    {{- else }}
     credentials-file: /etc/cloudflared/credentials.json
-    {{- end }}
     ingress:
 {{- range .Values.config.ingress }}
 {{- if .hostname }}
