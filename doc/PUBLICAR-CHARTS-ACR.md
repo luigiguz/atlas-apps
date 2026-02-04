@@ -9,7 +9,7 @@ Los charts de PosLite se publican en ACR en formato OCI y se consumen desde **at
 | poslite-db | PostgreSQL + PgAdmin |
 | poslite-core | Core (Portal, WebAPI, Workers) |
 | poslite-pam | Stack PAM completo |
-| poslite-horustech | Stack Horustech completo |
+| poslite-ht (carpeta poslite-horustech) | Stack Horustech completo |
 | poslite-cloudflared-core | Cloudflared Core + BD |
 | poslite-cloudflared-pam | Cloudflared PAM + BD |
 | poslite-cloudflared-horustech | Cloudflared Horustech + BD |
@@ -56,7 +56,7 @@ helm package poslite-pam
 helm push poslite-pam-1.0.0.tgz oci://atlashelmrepo.azurecr.io/helm
 
 helm package poslite-horustech
-helm push poslite-horustech-1.0.0.tgz oci://atlashelmrepo.azurecr.io/helm
+helm push poslite-ht-1.0.0.tgz oci://atlashelmrepo.azurecr.io/helm
 
 helm package poslite-cloudflared-core
 helm push poslite-cloudflared-core-1.0.0.tgz oci://atlashelmrepo.azurecr.io/helm
@@ -74,6 +74,7 @@ La versión del `.tgz` sale de `Chart.yaml` (`version: 1.0.0`). Si subes una nue
 
 ```bash
 helm show chart oci://atlashelmrepo.azurecr.io/helm/poslite-db --version 1.0.0
+helm show chart oci://atlashelmrepo.azurecr.io/helm/poslite-ht --version 1.0.0
 helm show chart oci://atlashelmrepo.azurecr.io/helm/poslite-cloudflared-core --version 1.0.0
 ```
 

@@ -43,9 +43,9 @@ jobs:
             poslite-cloudflared-core poslite-cloudflared-pam poslite-cloudflared-horustech; do
             if [ -d "$dir" ]; then
               echo "Packaging $dir..."
-              helm package "$dir"
-              tgz=$(ls -t ${dir}-*.tgz 2>/dev/null | head -1)
-              if [ -n "$tgz" ]; then
+              out=$(helm package "$dir" 2>&1)
+              tgz=$(echo "$out" | sed -n 's/.*\/\([^/]*\.tgz\)/\1/p')
+              if [ -n "$tgz" ] && [ -f "$tgz" ]; then
                 helm push "$tgz" "oci://${{ env.ACR_REGISTRY }}/helm"
                 echo "Pushed $tgz"
               fi
